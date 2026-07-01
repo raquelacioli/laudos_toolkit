@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import streamlit as st
+import base64
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
@@ -12,21 +13,41 @@ import preencher_laudo as pl
 
 st.set_page_config(page_title="Gerador de Laudos Periciais", page_icon="📄", layout="wide")
 
-st.markdown(
-    "<style>"
-    "body {background-color: #f3f5f8;}"
-    ".stApp {color: #1f2937; font-family: 'Segoe UI', sans-serif;}"
-    ".login-card {background: #ffffff; padding: 36px 28px; border-radius: 22px; "
-    "box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08); max-width: 650px; margin: auto;}"
-    ".login-card h1 {margin-bottom: 8px; color: #0b4d78;}"
-    ".login-card p {color: #475569; margin-bottom: 24px; line-height: 1.6;}"
-    ".info-box {background: #eef4fb; padding: 18px 20px; border-radius: 16px; margin-bottom: 20px;}"
-    ".app-header {background: linear-gradient(135deg, #0b4d78 0%, #1a8cd8 100%); padding: 28px; border-radius: 24px; color: white; margin-bottom: 24px;}"
-    ".app-header h1 {margin: 0; font-size: 2.3rem;}"
-    ".app-header p {margin: 8px 0 0; color: rgba(255,255,255,0.84); font-size: 1rem;}"
-    "</style>",
-    unsafe_allow_html=True,
-)
+_bg_css = ""
+img_path = ROOT / "imagem.png"
+if img_path.exists():
+    with open(img_path, "rb") as f:
+        data = f.read()
+    b64 = base64.b64encode(data).decode()
+    _card_bg = f"background-image: url('data:image/png;base64,{b64}'); background-size: cover; background-position: center center;"
+
+    st.markdown(
+        f"<style>"
+        f".login-card {{{_card_bg} padding:36px 28px; border-radius:22px; box-shadow: 0 20px 50px rgba(15,23,42,0.08); max-width:650px; margin:auto; background-color: rgba(255,255,255,0.92);}}"
+        ".stApp {color: #1f2937; font-family: 'Segoe UI', sans-serif;}"
+        ".login-card h1 {margin-bottom: 8px; color: #0b4d78;}"
+        ".login-card p {color: #475569; margin-bottom: 24px; line-height: 1.6;}"
+        ".info-box {background: #eef4fb; padding: 18px 20px; border-radius: 16px; margin-bottom: 20px;}"
+        ".app-header {background: linear-gradient(135deg, #0b4d78 0%, #1a8cd8 100%); padding: 28px; border-radius: 24px; color: white; margin-bottom: 24px;}"
+        ".app-header h1 {margin: 0; font-size: 2.3rem;}"
+        ".app-header p {margin: 8px 0 0; color: rgba(255,255,255,0.84); font-size: 1rem;}"
+        "</style>",
+        unsafe_allow_html=True,
+    )
+else:
+    st.markdown(
+        "<style>"
+        ".stApp {color: #1f2937; font-family: 'Segoe UI', sans-serif;}"
+        ".login-card {background: rgba(255,255,255,0.95); padding: 36px 28px; border-radius: 22px; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08); max-width: 650px; margin: auto;}"
+        ".login-card h1 {margin-bottom: 8px; color: #0b4d78;}"
+        ".login-card p {color: #475569; margin-bottom: 24px; line-height: 1.6;}"
+        ".info-box {background: #eef4fb; padding: 18px 20px; border-radius: 16px; margin-bottom: 20px;}"
+        ".app-header {background: linear-gradient(135deg, #0b4d78 0%, #1a8cd8 100%); padding: 28px; border-radius: 24px; color: white; margin-bottom: 24px;}"
+        ".app-header h1 {margin: 0; font-size: 2.3rem;}"
+        ".app-header p {margin: 8px 0 0; color: rgba(255,255,255,0.84); font-size: 1rem;}"
+        "</style>",
+        unsafe_allow_html=True,
+    )
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
