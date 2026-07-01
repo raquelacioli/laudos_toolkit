@@ -141,58 +141,58 @@ with st.container():
 
     st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
     if st.button("Gerar laudo", type="primary"):
-    if not modelo_file or not dados_file:
-        st.error("Envie pelo menos o modelo .docx e o arquivo .txt antes de gerar.")
-        st.stop()
+        if not modelo_file or not dados_file:
+            st.error("Envie pelo menos o modelo .docx e o arquivo .txt antes de gerar.")
+            st.stop()
 
-    with st.spinner("Processando o laudo e anexos..."):
-        tmp_dir = Path(tempfile.mkdtemp(prefix="laudo_streamlit_"))
-        try:
-            modelo_path = tmp_dir / modelo_file.name
-            dados_path = tmp_dir / dados_file.name
-            modelo_path.write_bytes(modelo_file.getvalue())
-            dados_path.write_text(dados_file.getvalue().decode("utf-8"), encoding="utf-8")
+        with st.spinner("Processando o laudo e anexos..."):
+            tmp_dir = Path(tempfile.mkdtemp(prefix="laudo_streamlit_"))
+            try:
+                modelo_path = tmp_dir / modelo_file.name
+                dados_path = tmp_dir / dados_file.name
+                modelo_path.write_bytes(modelo_file.getvalue())
+                dados_path.write_text(dados_file.getvalue().decode("utf-8"), encoding="utf-8")
 
-            fotos_paths = []
-            for uploaded in fotos_files or []:
-                photo_path = tmp_dir / uploaded.name
-                photo_path.write_bytes(uploaded.getvalue())
-                fotos_paths.append(photo_path)
+                fotos_paths = []
+                for uploaded in fotos_files or []:
+                    photo_path = tmp_dir / uploaded.name
+                    photo_path.write_bytes(uploaded.getvalue())
+                    fotos_paths.append(photo_path)
 
-            face_path = None
-            if face_photo_file is not None:
-                face_path = tmp_dir / face_photo_file.name
-                face_path.write_bytes(face_photo_file.getvalue())
+                face_path = None
+                if face_photo_file is not None:
+                    face_path = tmp_dir / face_photo_file.name
+                    face_path.write_bytes(face_photo_file.getvalue())
 
-            output_path = tmp_dir / output_name
-            if not output_name.lower().endswith(".docx"):
-                output_path = tmp_dir / f"{output_name}.docx"
+                output_path = tmp_dir / output_name
+                if not output_name.lower().endswith(".docx"):
+                    output_path = tmp_dir / f"{output_name}.docx"
 
-            log = generate_docx_from_uploads(
-                modelo_path=modelo_path,
-                dados_txt_path=dados_path,
-                fotos_paths=fotos_paths,
-                output_path=output_path,
-                foto_rosto_path=face_path,
-                work_dir=tmp_dir / "work",
-            )
+                log = generate_docx_from_uploads(
+                    modelo_path=modelo_path,
+                    dados_txt_path=dados_path,
+                    fotos_paths=fotos_paths,
+                    output_path=output_path,
+                    foto_rosto_path=face_path,
+                    work_dir=tmp_dir / "work",
+                )
 
-            if not output_path.exists():
-                raise RuntimeError("O arquivo final não foi criado.")
+                if not output_path.exists():
+                    raise RuntimeError("O arquivo final não foi criado.")
 
-            bytes_data = output_path.read_bytes()
-            st.success("Laudo gerado com sucesso.")
-            st.download_button(
-                label="Baixar documento .docx",
-                data=bytes_data,
-                file_name=output_path.name,
-                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            )
+                bytes_data = output_path.read_bytes()
+                st.success("Laudo gerado com sucesso.")
+                st.download_button(
+                    label="Baixar documento .docx",
+                    data=bytes_data,
+                    file_name=output_path.name,
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                )
 
-            st.subheader("Log do processamento")
-            for line in log:
-                st.write(line)
-        finally:
-            import shutil
+                st.subheader("Log do processamento")
+                for line in log:
+                    st.write(line)
+            finally:
+                import shutil
 
-            shutil.rmtree(tmp_dir, ignore_errors=True)
+                shutil.rmtree(tmp_dir, ignore_errors=True)
