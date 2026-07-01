@@ -47,7 +47,10 @@ if not st.session_state.logged_in:
         if st.button("Entrar", type="primary"):
             if email == "tiagoacioli@gmail.com" and password == "sucesso":
                 st.session_state.logged_in = True
-                st.experimental_rerun()
+                if hasattr(st, "rerun"):
+                    st.rerun()
+                else:
+                    st.experimental_rerun()
             else:
                 st.error("Login ou senha incorretos.")
     st.stop()
